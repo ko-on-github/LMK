@@ -11,4 +11,4 @@ ticker.visualize("V,C,CL,LMK,WM,PV")
 # To run, in terminal python main.py when you are in LMK folder
 # To run spyder, in terminal spyder main.py when you are in LMK folder
 
-# Experiment
+# Experiment 2
