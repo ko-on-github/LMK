@@ -18,7 +18,7 @@ from collections import namedtuple
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from matplotlib.dates import num2date
-from matplotlib.dates import MonthLocator, WeekdayLocator, DateFormatter, MONDAY, FRIDAY
+from matplotlib.dates import YearLocator, MonthLocator, WeekdayLocator, DateFormatter, MONDAY, FRIDAY
 
 # http://stackoverflow.com/questions/11707586/python-pandas-widen-output-display
 import pandas
@@ -53,10 +53,11 @@ def ensure_columns_exist(h, columns):
     columns = list(set(columns) - set(h.columns))
     if not columns: return h
 
-    # XXX: make it configurable
+    # XXX: make it configurable. 
+    # KO: Adjust ATR_factor here
     pivot_window_size = 5
-    atr_factor = 1.0
-
+    atr_factor = 5.0
+    
     if "CC" in columns:
         # necessary to calculate updown
         h["CC"] = h["Close"].pct_change()
@@ -241,12 +242,15 @@ class Ticker:
 
         # -- Basic Volume/Price --
         @plot_elements("V")
-        @columns("CC", "Volume")
+        #KO:@columns("CC", "Volume")
+        @columns("CC", "Band")
         def plot_V(ax, h):
             up = h[h["CC"] >= 0]
-            ax.bar(up.index, up["Volume"], width=1, color="black", edgecolor="black", linewidth=1, alpha=.3, align="center")
+            #KO:ax.bar(up.index, up["Volume"], width=1, color="black", edgecolor="black", linewidth=1, alpha=.3, align="center")
+            ax.bar(up.index, up["Band"], width=1, color="black", edgecolor="black", linewidth=1, alpha=.3, align="center")
             dn = h[h["CC"] < 0]
-            ax.bar(dn.index, dn["Volume"], width=1, color="red", edgecolor="red", linewidth=1, alpha=.3, align="center")
+            #KO:ax.bar(dn.index, dn["Volume"], width=1, color="red", edgecolor="red", linewidth=1, alpha=.3, align="center")
+            ax.bar(dn.index, dn["Band"], width=1, color="red", edgecolor="red", linewidth=1, alpha=.3, align="center")
 
         @plot_elements("C")
         @columns("Close", "CC")
@@ -389,16 +393,19 @@ class Ticker:
         dayFmt = FuncFormatter(_dayFmt)
 
         months  = MonthLocator(range(1, 13), bymonthday=1, interval=1)
+        years = YearLocator()
         # http://stackoverflow.com/questions/11623498/date-formatting-with-matplotlib
         def _monthFmt(x, pos):
             dt = num2date(x)
             return dt.strftime('\n%Y') if dt.month == 1 else dt.strftime("\n%b")
         monthFmt = FuncFormatter(_monthFmt)
 
+
         for ax in (ax0, ax1):
-            ax.xaxis.set_major_locator(months)
+            #ax.xaxis.set_major_locator(months)
+            ax.xaxis.set_major_locator(years)
             ax.xaxis.set_major_formatter(monthFmt)
-            plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, color="blue")
+            plt.setp(ax.xaxis.get_majorticklabels(), rotation=90, color="blue")
             if len(ax.get_xticks()) <= 12:
                 ax.xaxis.set_minor_locator(days)
                 ax.xaxis.set_minor_formatter(dayFmt)

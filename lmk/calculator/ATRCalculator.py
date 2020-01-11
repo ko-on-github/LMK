@@ -15,6 +15,7 @@ class ATRCalculator(object):
         HL = tick["High"] - tick["Low"]
         # if not self.last_tick:
         # => ValueError: 'The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()'
+        # The following is the formula for calculating the ATR
         if self.last_tick is not None:
             HCp = abs(tick["High"] - self.last_tick["Close"]) # Cp => previous Close
             LCp = abs(tick["Low"] - self.last_tick["Close"])
